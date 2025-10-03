@@ -10,10 +10,16 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.data.DataTracker;
 
 import com.example.item.ModItems; // <- import your Fairy Charm item
 
 public class FairyEntity extends TameableEntity {
+
+    // Data tracker for color
+    private static final TrackedData<Integer> COLOR = DataTracker.registerData(FairyEntity.class, TrackedDataHandlerRegistry.INTEGER);
 
     public FairyEntity(EntityType<? extends TameableEntity> type, World world) {
         super(type, world);
@@ -29,23 +35,10 @@ public class FairyEntity extends TameableEntity {
     }
 
     @Override
-    public void tick() {
-        super.tick();
-
-        // Spawn sparkles around the fairy when tamed
-        if (this.world.isClient && this.isTamed()) {
-            for (int i = 0; i < 2; i++) {
-                double offsetX = (this.random.nextDouble() - 0.5D) * 0.5;
-                double offsetY = this.random.nextDouble() * 0.5 + 0.5;
-                double offsetZ = (this.random.nextDouble() - 0.5D) * 0.5;
-                this.world.addParticle(ParticleTypes.HAPPY_VILLAGER,
-                        this.getX() + offsetX,
-                        this.getY() + offsetY,
-                        this.getZ() + offsetZ,
-                        0, 0, 0);
-            }
-        }
+    protected void initDataTracker() {
+        super.initDataTracker();
+        this.dataTracker.startTracking(COLOR, 0); // default color = 0 (pink)
     }
 
-    // Right-click to tame with Fairy Charm
-    @Ove
+    public void setColor(int color) {
+        this.dataTracker.se
