@@ -37,8 +37,3 @@ public class FairyEntity extends TameableEntity {
     @Override
     protected void initDataTracker() {
         super.initDataTracker();
-        this.dataTracker.startTracking(COLOR, 0); // default color = 0 (pink)
-    }
-
-    public void setColor(int color) {
-        this.dataTracker.se
