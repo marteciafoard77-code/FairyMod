@@ -7,8 +7,11 @@ import net.minecraft.entity.ai.goal.SwimGoal;
 import net.minecraft.entity.ai.goal.SitGoal;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraft.particle.ParticleTypes;
+
+import com.example.item.ModItems; // <- import your Fairy Charm item
 
 public class FairyEntity extends TameableEntity {
 
@@ -29,7 +32,7 @@ public class FairyEntity extends TameableEntity {
     public void tick() {
         super.tick();
 
-        // Spawn sparkles around the fairy
+        // Spawn sparkles around the fairy when tamed
         if (this.world.isClient && this.isTamed()) {
             for (int i = 0; i < 2; i++) {
                 double offsetX = (this.random.nextDouble() - 0.5D) * 0.5;
@@ -44,6 +47,5 @@ public class FairyEntity extends TameableEntity {
         }
     }
 
-    // Right-click taming logic will go in a separate handler later
-}
-
+    // Right-click to tame with Fairy Charm
+    @Ove
