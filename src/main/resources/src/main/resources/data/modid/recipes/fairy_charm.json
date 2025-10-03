@@ -1,19 +1,16 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    " G ",
-    "PTP",
-    " G "
+    "   ",
+    "PGP",
+    "   "
   ],
   "key": {
-    "G": {
-      "item": "minecraft:glowstone"
-    },
     "P": {
       "item": "minecraft:pink_tulip"
     },
-    "T": {
-      "item": "minecraft:totem_of_undying"
+    "G": {
+      "item": "minecraft:glowstone"
     }
   },
   "result": {
