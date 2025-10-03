@@ -1,1 +1,7 @@
+{
+  "parent": "minecraft:entity/creature",
+  "textures": [
+    "modid:textures/entity/fairy/fairy_pink"
+  ]
+}
 
