@@ -8,13 +8,14 @@ import net.minecraft.entity.ai.goal.SitGoal;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.data.DataTracker;
 
-import com.example.item.ModItems; // <- import your Fairy Charm item
+import com.example.item.ModItems;
 
 public class FairyEntity extends TameableEntity {
 
@@ -29,7 +30,7 @@ public class FairyEntity extends TameableEntity {
     @Override
     protected void initGoals() {
         this.goalSelector.add(1, new SwimGoal(this));
-        this.goalSelector.add(2, new SitGoal(this));
+        this.goalSelector.add(2, new SitGoal(this)); // handles sitting
         this.goalSelector.add(3, new FollowOwnerGoal(this, 1.0D, 3.0F, 10.0F, false));
         this.goalSelector.add(4, new LookAroundGoal(this));
     }
@@ -52,7 +53,7 @@ public class FairyEntity extends TameableEntity {
     public void tick() {
         super.tick();
 
-        // Spawn sparkles around the fairy when tamed
+        // Only spawn sparkles when tamed
         if (this.world.isClient && this.isTamed()) {
             for (int i = 0; i < 2; i++) {
                 double offsetX = (this.random.nextDouble() - 0.5D) * 0.5;
@@ -61,43 +62,37 @@ public class FairyEntity extends TameableEntity {
 
                 // Choose particle type based on color
                 if (getColor() == 0) { // pink
-                    this.world.addParticle(ParticleTypes.HEART,
-                            this.getX() + offsetX,
-                            this.getY() + offsetY,
-                            this.getZ() + offsetZ,
-                            0, 0, 0);
+                    this.world.addParticle(ParticleTypes.HEART, this.getX() + offsetX, this.getY() + offsetY, this.getZ() + offsetZ, 0, 0, 0);
                 } else if (getColor() == 1) { // blue
-                    this.world.addParticle(ParticleTypes.ENCHANT,
-                            this.getX() + offsetX,
-                            this.getY() + offsetY,
-                            this.getZ() + offsetZ,
-                            0, 0, 0);
+                    this.world.addParticle(ParticleTypes.ENCHANT, this.getX() + offsetX, this.getY() + offsetY, this.getZ() + offsetZ, 0, 0, 0);
                 } else { // mixed
-                    this.world.addParticle(ParticleTypes.HAPPY_VILLAGER,
-                            this.getX() + offsetX,
-                            this.getY() + offsetY,
-                            this.getZ() + offsetZ,
-                            0, 0, 0);
+                    this.world.addParticle(ParticleTypes.HAPPY_VILLAGER, this.getX() + offsetX, this.getY() + offsetY, this.getZ() + offsetZ, 0, 0, 0);
                 }
             }
         }
     }
 
-    // Right-click to tame with Fairy Charm
     @Override
-    public boolean interactMob(PlayerEntity player, net.minecraft.util.Hand hand) {
+    public boolean interactMob(PlayerEntity player, Hand hand) {
         ItemStack stack = player.getStackInHand(hand);
 
+        // Right-click with Fairy Charm to tame
         if (!this.world.isClient && stack.getItem() == ModItems.FAIRY_CHARM && !this.isTamed()) {
-            this.setOwner(player);     // sets the player as the fairy's owner
-            this.setTamed(true);       // marks the fairy as tamed
-            stack.decrement(1);        // consumes the Fairy Charm
+            this.setOwner(player);
+            this.setTamed(true);
+            stack.decrement(1);
+
             this.world.sendEntityStatus(this, (byte)7); // heart particles
 
-            // Assign a random color when tamed
-            int color = this.random.nextInt(3); // 0 = pink, 1 = blue, 2 = mixed
+            int color = this.random.nextInt(3); // 0=pink, 1=blue, 2=mixed
             this.setColor(color);
+            return true;
+        }
 
+        // Right-click with empty hand to sit/unsit
+        if (!this.world.isClient && stack.isEmpty() && this.isTamed()) {
+            this.getNavigation().stop();
+            this.setSitting(!this.isSitting());
             return true;
         }
 
