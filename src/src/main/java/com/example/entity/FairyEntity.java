@@ -37,3 +37,70 @@ public class FairyEntity extends TameableEntity {
     @Override
     protected void initDataTracker() {
         super.initDataTracker();
+        this.dataTracker.startTracking(COLOR, 0); // default color = 0 (pink)
+    }
+
+    public void setColor(int color) {
+        this.dataTracker.set(COLOR, color);
+    }
+
+    public int getColor() {
+        return this.dataTracker.get(COLOR);
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        // Spawn sparkles around the fairy when tamed
+        if (this.world.isClient && this.isTamed()) {
+            for (int i = 0; i < 2; i++) {
+                double offsetX = (this.random.nextDouble() - 0.5D) * 0.5;
+                double offsetY = this.random.nextDouble() * 0.5 + 0.5;
+                double offsetZ = (this.random.nextDouble() - 0.5D) * 0.5;
+
+                // Choose particle type based on color
+                if (getColor() == 0) { // pink
+                    this.world.addParticle(ParticleTypes.HEART,
+                            this.getX() + offsetX,
+                            this.getY() + offsetY,
+                            this.getZ() + offsetZ,
+                            0, 0, 0);
+                } else if (getColor() == 1) { // blue
+                    this.world.addParticle(ParticleTypes.ENCHANT,
+                            this.getX() + offsetX,
+                            this.getY() + offsetY,
+                            this.getZ() + offsetZ,
+                            0, 0, 0);
+                } else { // mixed
+                    this.world.addParticle(ParticleTypes.HAPPY_VILLAGER,
+                            this.getX() + offsetX,
+                            this.getY() + offsetY,
+                            this.getZ() + offsetZ,
+                            0, 0, 0);
+                }
+            }
+        }
+    }
+
+    // Right-click to tame with Fairy Charm
+    @Override
+    public boolean interactMob(PlayerEntity player, net.minecraft.util.Hand hand) {
+        ItemStack stack = player.getStackInHand(hand);
+
+        if (!this.world.isClient && stack.getItem() == ModItems.FAIRY_CHARM && !this.isTamed()) {
+            this.setOwner(player);     // sets the player as the fairy's owner
+            this.setTamed(true);       // marks the fairy as tamed
+            stack.decrement(1);        // consumes the Fairy Charm
+            this.world.sendEntityStatus(this, (byte)7); // heart particles
+
+            // Assign a random color when tamed
+            int color = this.random.nextInt(3); // 0 = pink, 1 = blue, 2 = mixed
+            this.setColor(color);
+
+            return true;
+        }
+
+        return super.interactMob(player, hand);
+    }
+}
